@@ -4,7 +4,7 @@ import supabase from "@/lib/db";
 import type { IMember } from "@/types/member";
 import { FormEvent, useEffect, useState } from "react";
 import Image from 'next/image';
-import { Ellipsis, X } from "lucide-react";
+import { Ellipsis} from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter,  DialogDescription, DialogTitle, DialogClose  } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,7 @@ import { IComm } from "@/types/comm";
 import { IGift } from "@/types/gift";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage,BreadcrumbSeparator} from "@/components/ui/breadcrumb"
+
 const imgUrl = 'https://mqichvjbjuhwmbtpnklj.supabase.co/storage/v1/object/public/images/';
 const CommunityPage =  () => {
     const [member, setMember] = useState<IMember[]>([]); 
@@ -25,7 +26,6 @@ const CommunityPage =  () => {
     const [startDialog, setStartDialog] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
     const [memToken, setMemToken] = useState('');
-    const [result, setResult] = useState([]);
     const [memActive, setMemActive] = useState<IMember|null>();
     const [selectedMember, setSelectedMember] = useState<{
         member: IMember;
@@ -39,7 +39,7 @@ const CommunityPage =  () => {
     const fetchComm = async () => {
         if (router.query.id)
         {
-            var token = router.query.id + "";                
+            const token = router.query.id + "";                
             const {data, error} = await supabase.from("community")
                 .select("*, member(mem_id, mem_name, gift(gift_id, is_ref, is_res, gift_for, gift_by, gift_letter)), comm_status, status(status_name)")
                 .eq("comm_token", token.toUpperCase()).single(); 
@@ -52,15 +52,8 @@ const CommunityPage =  () => {
                 {
                     setComm(data);
                     if (data.comm_status != "CR") {
-                        var gifts = data.member.map((x:IMember) => x.gift);
-                        var memList = data.member.map((mem:IMember) => ({...mem, gift_created:(gifts.filter((gift:IGift[])=>gift[0].gift_by == mem.mem_id ))[0][0].is_res}));
-                        /*if (data.comm_status == "FR") {
-                            var img = await getAllImages();
-                            if (img!=undefined && img.length > 0)
-                            {
-                                memList = data.member.map((x:IMember) => ({...x, image:img?.filter(y => y.name == x.gift[0].gift_by.toString())[0]}));
-                            }
-                        }*/
+                        const gifts = data.member.map((x:IMember) => x.gift);
+                        const memList = data.member.map((mem:IMember) => ({...mem, gift_created:(gifts.filter((gift:IGift[])=>gift[0].gift_by == mem.mem_id ))[0][0].is_res}));
                         setMember(memList);
                     }
                     else
@@ -72,23 +65,6 @@ const CommunityPage =  () => {
         }
     }
     
-    async function getAllImages() {
-        const {data, error} = await supabase
-            .storage
-            .from('images')
-            .list(comm?.comm_id + '/res/');
-
-        if (data)
-        {
-            return data;
-        }
-        else
-        {
-            alert("Error loading image");
-            console.log(error);
-        }
-    }
-
     useEffect(() =>
     {   
         if (!router.isReady) return;
@@ -99,22 +75,21 @@ const CommunityPage =  () => {
     const handleStart = async () => {
         alert('started');
         if (comm && comm.member.length> 0) {
-            var sorted = comm.member.map((x) => x.mem_id);
-            var shuffled = sorted;
+            const sorted = comm.member.map((x) => x.mem_id);
+            let shuffled = sorted;
             while (check(sorted, shuffled))
             {
                 shuffled=shuffle(sorted);
             }
             
-            var giftIds = comm.member.map((x) => (x.gift[0].gift_id));
+            const giftIds = comm.member.map((x) => (x.gift[0].gift_id));
             console.log(giftIds);
             console.log(sorted);
             console.log(shuffled);
-            var updateList = [];
+            const updateList = [];
             for (let i = 0; i< sorted.length; i++) {
                 updateList.push({'gift_id':giftIds[i], 'gift_for':sorted[i], 'gift_by':shuffled[i]});
             }
-            console.log(updateList);
             const { data, error } = await supabase
                 .from('gift')
                 .upsert(updateList);
@@ -130,7 +105,7 @@ const CommunityPage =  () => {
     const shuffle = (members : number[]) => {
         const sortedArr = structuredClone(members);
         for (let i = sortedArr.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
+            const j = Math.floor(Math.random() * (i + 1));
             console.log(sortedArr[i]);
             console.log(sortedArr[j]);
             [sortedArr[i], sortedArr[j]] = [sortedArr[j], sortedArr[i]];
@@ -227,7 +202,7 @@ const CommunityPage =  () => {
     const handleDeleteMember = async () =>  {
         try {
             console.log(selectedMember?.member);
-            const {data, error} = await supabase.from('member')
+            const {error} = await supabase.from('member')
                 .delete()
                 .eq('mem_id', selectedMember?.member.mem_id);
             if (error)

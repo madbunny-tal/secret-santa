@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import supabase from "@/lib/db";
 import type { IComm } from "@/types/comm";
-import Image from 'next/image';
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -39,7 +38,7 @@ const Home = () => {
   }, [supabase]);
   
   const verifyCommToken = async () => {
-    const {data, error} = await supabase.from('community')
+    const {error} = await supabase.from('community')
       .select('*')
       .eq("comm_token", selectedCommunity?.comm_token)
       .eq("comm_id", selectedCommunity?.comm_id);
@@ -60,7 +59,7 @@ const Home = () => {
       console.log(Object.fromEntries(formData));
 
       //community insert
-      var commData = Object.fromEntries(formData);
+      const commData = Object.fromEntries(formData);
       delete (commData.mem_name);
       delete (commData.mem_token);
       commData.comm_status="CR";
@@ -74,7 +73,7 @@ const Home = () => {
         if (data) {
           setComm((prev) => [...data, ...prev]);
         }
-        var memData = Object.fromEntries(formData);
+        const memData = Object.fromEntries(formData);
         delete (memData.comm_desc);
         delete (memData.comm_name);
         delete (memData.comm_token);
