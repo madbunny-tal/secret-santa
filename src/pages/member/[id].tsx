@@ -54,7 +54,7 @@ const Member = () => {
     async function uploadImage(e:HTMLInputElement, isRef:boolean) {
         if (e.files != null && e.files.length > 0)
         {
-            let file = e.files[0];
+            const file = e.files[0];
             
             const {data, error} = await supabase
                 .storage
