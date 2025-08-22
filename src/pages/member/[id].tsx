@@ -155,8 +155,8 @@ const Member = () => {
                     mem &&
                     <div className="grid items-center w-full">
                         <div className="flex">
-                            <div className="center lg:w-4/12 sm:w-full text-3xl font-bold text-background bg-foreground p-2">
-                                <h1 className="text-center">{mem.comm_name}</h1>
+                            <div className="center lg:w-4/12 sm:w-full text-3xl font-bold bg-foreground p-2">
+                                <h1 className="text-center text-primary-foreground">{mem.comm_name}</h1>
                             </div>                        
                             <div className="text-right lg:w-8/12 sm:w-full text-3xl font-bold p-2">{mem.mem_name}'s Dashboard</div>
                         </div>

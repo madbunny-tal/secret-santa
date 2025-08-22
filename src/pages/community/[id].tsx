@@ -306,11 +306,12 @@ const CommunityPage =  () => {
                     )
                 }          
             </div>
-            <h4 className="font-semibold text-2sl mb-4">Status: {comm?.status.status_name}({
+            <h4 className="font-semibold text-2sl mb-2">Status: {comm?.status.status_name}({
                 comm?.comm_status=="CR" ?
                   member.filter(x => x.gift_reference==true).length
                 : member.filter(x => x.gift_created==true).length
             }/{member.length})</h4> 
+            <p className="text-2sl mb-4">{comm?.comm_desc}</p>
             <div>
                 <Table>
                     <TableHeader>
@@ -447,7 +448,12 @@ const CommunityPage =  () => {
                 </div>
             }                       
             <Dialog
-                open={selectedMember !== null && selectedMember?.action === 'edit'}                
+                open={selectedMember !== null && selectedMember?.action === 'edit'}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setSelectedMember(null);
+                    } 
+                }}                   
             >
                 <DialogContent className="sm:max-w-md">
                     <form onSubmit={handleEdit} className="space-y-4">
@@ -460,7 +466,7 @@ const CommunityPage =  () => {
                             <Label htmlFor="name">Name</Label>
                             <Input id="name" name="mem_name" placeholder="Insert Name" required defaultValue={selectedMember?.member.mem_name}></Input>
                         </div>
-                        <div  className="grid w-full gap-4">
+                        {/*<div  className="grid w-full gap-4">
                             <div className="grid-w-full gap-1.5"></div>
                             <Label htmlFor="comm">Community</Label>
                             <Input id="comm" name="comm_id" placeholder="Insert Community" required defaultValue={selectedMember?.member.comm_id}></Input>
@@ -480,7 +486,6 @@ const CommunityPage =  () => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        {/*
                         <div  className="grid w-full gap-4">
                             <div className="grid-w-full gap-1.5"></div>
                             <Label htmlFor="desc">Description</Label>
