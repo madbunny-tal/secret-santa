@@ -41,8 +41,7 @@ const CommunityPage =  () => {
             const token = router.query.id + "";                
             const {data, error} = await supabase.from("community")
                 .select("*, member(mem_id, mem_name, gift(gift_id, is_ref, is_res, gift_for, gift_by, gift_letter)), comm_status, status(status_name)")
-                .eq("comm_token", token.toUpperCase()).single(); 
-            console.log(data);       
+                .eq("comm_token", token.toUpperCase()).single();     
             if (error) {
             console.log("error: ", error)   ;
             }
@@ -307,12 +306,12 @@ const CommunityPage =  () => {
             </div>
             <h4 className="font-semibold text-2sl mb-2">Status: {comm?.status.status_name}({
                 comm?.comm_status=="CR" ?
-                  member.filter(x => x.gift_reference==true).length
+                  member.filter(x => x.gift[0].is_ref==true).length
                 : member.filter(x => x.gift_created==true).length
             }/{member.length})</h4> 
             <p className="text-2sl mb-4">{comm?.comm_desc}</p>
             <div>
-                <Table>
+                <Table className="font">
                     <TableHeader>
                         <TableRow>
                             <TableHead  className="font-bold">Member Name</TableHead>

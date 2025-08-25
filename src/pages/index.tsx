@@ -241,7 +241,7 @@ const Home = () => {
                         <Label htmlFor="comm_token">Community Token</Label>
                         <div className="flex">
                             <Input value={token.comm} id="comm_token" name="comm_token" className="w-9/12" readOnly></Input>
-                            <Button className="w-3/12 " onClick={() => {
+                            <Button type="button" className="w-3/12 " onClick={() => {
                                 navigator.clipboard.writeText(token.comm);
                                 toast("Token copied! Please save it to check community progresss")}}>Copy</Button>
                         </div>
@@ -259,7 +259,7 @@ const Home = () => {
                         <Label htmlFor="mem_token">Member Token (Owner)</Label>
                         <div className="flex">
                             <Input value={token.owner} id="mem_token" name="mem_token" className="w-9/12" readOnly></Input>
-                            <Button className="w-3/12 " onClick={() => {
+                            <Button type="button" className="w-3/12 " onClick={() => {
                                 navigator.clipboard.writeText(token.owner);
                                 toast("Token copied! Please save it to update your progress")}}>Copy</Button>
                         </div>

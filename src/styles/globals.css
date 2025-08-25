@@ -16,7 +16,7 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(42.843% 0.06778 8.201);
   --muted: oklch(91.731% 0.01795 4.214);
-  --muted-foreground: oklch(36.278% 0.03595 359.841);
+  --muted-foreground: oklch(55.526% 0.0132 357.059);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -81,7 +81,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: oklch(55.191% 0.05814 5.606);
   }
 }
 
