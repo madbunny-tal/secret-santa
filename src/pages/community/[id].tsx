@@ -158,14 +158,17 @@ const CommunityPage =  () => {
             console.log(Object.fromEntries(formData));
             const {data, error} = await supabase.from('member')
                 .insert(Object.fromEntries(formData))
-                .select();
+                .select(); 
+
             if (error)
                 console.log(error)
-            else {                
-                if (data) {
-                    setMember((prev) => [...data, ...prev]);
+            else {        
+                if (data) {     
+                    let newMem = data[0];    
+                    newMem.gift = await getSingleGift(newMem.mem_id);
+                    setMember((prev) => [...prev, newMem]);            
+                    setMemActive(newMem);
                 }
-                setMemActive(data[0]);
                 goToMem(memToken);
                 toast('Member added successfully');
                 setCreateDialog(false);
@@ -173,6 +176,15 @@ const CommunityPage =  () => {
         }
         catch (error) {
             console.log(error)
+        }
+    }
+
+    const getSingleGift = async (id: Number) => {
+        const {data, error} = await supabase.from('gift')
+                        .select('*')
+                        .eq("gift_for", id);
+        if (data){
+            return data;
         }
     }
     const handleEdit = async (e: FormEvent<HTMLFormElement>) => {

@@ -9,19 +9,25 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage,BreadcrumbSeparator} from "@/components/ui/breadcrumb"
-
 const imgUrl = 'https://mqichvjbjuhwmbtpnklj.supabase.co/storage/v1/object/public/images/';
 
 const Member = () => {
     const router = useRouter();
     const [mem, setMem] = useState<IMember|null>(null);
+    const [isUploading, setIsUploading] = useState(false);
     const [refUrl, setRefUrl] = useState('');
     const [fields, setFields] = useState({
         ref_image: false,
         res_image: false,
       }
-    ); //for invoice data received from form
+    ); //for reference image and result image
+    const [errMessage, setErrMessage] = useState({
+        refErr :'',
+        resErr :''
+    });
+    //for image upload error message 
     useEffect(() => {
         const fetchMember = async () => {
             if (router.query.id) {
@@ -54,6 +60,7 @@ const Member = () => {
     async function uploadImage(e:HTMLInputElement, isRef:boolean) {
         if (e.files != null && e.files.length > 0)
         {
+            setIsUploading(true);
             const file = e.files[0];
             
             const {data, error} = await supabase
@@ -75,11 +82,24 @@ const Member = () => {
                 else{
                     setFields((fields) => {return {...fields, res_image:true}});
                 }
+                setErrMessage( {
+                    refErr : '',
+                    resErr : ''
+                })
+
             }
             else
             {
+                toast(error.message);
+                if (isRef)                {
+                    setErrMessage((errMessage) => {return {...errMessage, refErr:error.message}})
+                }
+                else{
+                    setErrMessage((errMessage) => {return {...errMessage, resErr:error.message}})
+                }
                 console.log(error);
             }
+            setIsUploading(false);
         }
     }
 
@@ -192,6 +212,10 @@ const Member = () => {
                                                     <Image src={imgUrl+mem.comm_id + '/ref/'+mem.mem_id} height={1080} width={1080} alt='no image'/>
                                                 ):<></>
                                             }
+                                            {
+                                                isUploading && <Spinner/>
+                                            }
+                                            <p className="text-red-500">{errMessage.refErr}</p>
                                         </div>
                                         <div className="grid gap-2">
                                             <Label htmlFor="gift_desc">Description</Label>
@@ -257,6 +281,10 @@ const Member = () => {
                                                         <Image src={imgUrl+mem.comm_id + '/res/'+mem.mem_id} height={1080} width={1080} alt='no image'/>
                                                     ):<></>
                                                 }
+                                                {
+                                                    isUploading && <Spinner/>
+                                                }
+                                                <p className="text-red-500">{errMessage.resErr}</p>
                                             </div>
                                             <div className="grid gap-2">
                                                 <Label htmlFor="gift_letter">Gift letter</Label>
