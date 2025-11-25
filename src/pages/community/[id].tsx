@@ -164,7 +164,7 @@ const CommunityPage =  () => {
                 console.log(error)
             else {        
                 if (data) {     
-                    let newMem = data[0];    
+                    const newMem = data[0];    
                     newMem.gift = await getSingleGift(newMem.mem_id);
                     setMember((prev) => [...prev, newMem]);            
                     setMemActive(newMem);
@@ -179,12 +179,15 @@ const CommunityPage =  () => {
         }
     }
 
-    const getSingleGift = async (id: Number) => {
+    const getSingleGift = async (id: number) => {
         const {data, error} = await supabase.from('gift')
                         .select('*')
                         .eq("gift_for", id);
         if (data){
             return data;
+        }
+        else {
+            console.log(error);
         }
     }
     const handleEdit = async (e: FormEvent<HTMLFormElement>) => {
