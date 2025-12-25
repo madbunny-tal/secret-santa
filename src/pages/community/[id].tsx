@@ -30,7 +30,12 @@ const CommunityPage =  () => {
         member: IMember;
         action: 'edit' | 'delete';
     } | null>(null);
-
+    const [reveal, setReveal] = useState<{
+        mem_id: number;
+        value: boolean;
+    }[]>([]); 
+    
+    
     const router = useRouter();
     const goToMem = (path:string) => {
         window.open('/member/'+path);        
@@ -40,7 +45,7 @@ const CommunityPage =  () => {
         {
             const token = router.query.id + "";                
             const {data, error} = await supabase.from("community")
-                .select("*, member(mem_id, mem_name, gift(gift_id, is_ref, is_res, gift_for, gift_by, gift_letter)), comm_status, status(status_name)")
+                .select("*, member(mem_id, mem_name, gift(gift_id, gift_desc, is_ref, is_res, gift_for, gift_by, gift_letter)), comm_status, status(status_name)")
                 .eq("comm_token", token.toUpperCase()).single();     
             if (error) {
             console.log("error: ", error)   ;
@@ -53,10 +58,15 @@ const CommunityPage =  () => {
                         const gifts = data.member.map((x:IMember) => x.gift);
                         const memList = data.member.map((mem:IMember) => ({...mem, gift_created:(gifts.filter((gift:IGift[])=>gift[0].gift_by == mem.mem_id ))[0][0].is_res}));
                         setMember(memList);
+                        setReveal(data.member.map((x:{
+                            mem_id: number;
+                            value: boolean;
+                        }) => ({ mem_id:x.mem_id, value:false})));       
+                        console.log(reveal);          
                     }
                     else
                     {
-                        setMember(data.member);                        
+                        setMember(data.member);    
                     }
                 }
             }    
@@ -252,6 +262,13 @@ const CommunityPage =  () => {
             }
         }
     }
+    const handleReveal = (e:React.MouseEvent<HTMLAnchorElement>, id: number) => {
+        e.preventDefault();
+        if (reveal && reveal.length > 0)
+        {
+            setReveal((prev) => prev.map((x) => x.mem_id === id ? {...x, value:true} : x));
+        }
+    }
     return (
         <div className="container mx-auto py-8 w-10/12">
             <Breadcrumb className="mb-8">
@@ -425,15 +442,39 @@ const CommunityPage =  () => {
                 comm?.comm_status == "FR" && 
                 <div>
                     <h4 className="font-semibold text-2xl mb-4 mt-8">Result</h4>                
-                    <div className="lg:flex w-full items-center gap-3-full">
+                    <div className="grid w-full gap-3-full lg:grid-cols-2 md:grid-cols-1">
                         {member.map(
                             (mem) => (
-                                <Card key={mem.mem_id} id={`mem-${mem.mem_id}`} className="sm:w-full md:w-full lg:w-1/2">
+                                <>
+                                    <Card key={mem.mem_id} id={`mem-${mem.mem_id}`} className="w-full">
                                     <CardHeader>
                                         <CardTitle>
-                                            <h3 className="text-xl mb-4">Dear {mem.mem_name}</h3>
+                                            <h3 className="text-xl">{mem.mem_name} wishes</h3>
                                         </CardTitle>                                            
                                     </CardHeader>
+                                    <CardContent>
+                                        <div>
+                                            <div>
+                                                <p>{mem.gift[0].gift_desc}</p>
+                                            </div>
+                                        </div>
+                                        <Image
+                                            src={imgUrl+comm?.comm_id+"/ref/"+mem.mem_id}
+                                            alt='no image'
+                                            width={400}
+                                            height={400}
+                                            className="w-full object-cover rounded-lg mt-4"
+                                        />
+                                    </CardContent>
+                                </Card> 
+                                <Card key={mem.mem_id+"-res"} id={`mem-${mem.mem_id}`} className="w-full">
+                                    <CardHeader>
+                                        <CardTitle>
+                                            <h3 className="text-xl mb-4">Dear {mem.mem_name}</h3>                                            
+                                        </CardTitle>                                            
+                                    </CardHeader>
+                                    {
+                                        reveal.filter((x) => x.mem_id == mem.mem_id)[0].value &&                                    
                                     <CardContent>
                                         <Image
                                             src={imgUrl+comm?.comm_id+"/res/"+mem.gift[0].gift_by}
@@ -449,12 +490,23 @@ const CommunityPage =  () => {
                                             </div>
                                         </div>
                                     </CardContent>
+                                    }
                                     <CardFooter>
-                                        <a href={``} className="w-full" >
-                                            <Button className="w-full font-bold" size="lg">Download</Button>
-                                        </a>
+                                        {
+                                            reveal.filter((x) => x.mem_id == mem.mem_id)[0].value ? 
+                                            <a href={imgUrl+comm?.comm_id+"/res/"+mem.gift[0].gift_by} target="_blank" className="w-full" id={"download-"+mem.mem_id}>
+                                                <Button className="w-full font-bold" size="lg">Download</Button>
+                                            </a>
+                                            :
+                                            <a href='#' className="w-full" id={"reveal-"+mem.mem_id} onClick={(e) => handleReveal(e, mem.mem_id)}>
+                                                <Button className="w-full font-bold" size="lg">Reveal Result</Button>
+                                            </a>
+                                        }
                                     </CardFooter>
                                 </Card> 
+                                
+                                </>
+
                             )
                         )}
                         </div>
